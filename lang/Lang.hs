@@ -6,6 +6,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Lang where
 
@@ -13,6 +14,8 @@ import Control.Monad (ap)
 
 import Control.Lens
 import Bound
+import Data.Functor.Classes
+import Data.Deriving
 
 import GHC.Exts (Constraint)
 
@@ -32,6 +35,10 @@ data CVar a =
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 makePrisms ''CVar
+
+deriveEq1 ''CVar
+deriveOrd1 ''CVar
+deriveShow1 ''CVar
 
 data CoreF k a =
     CoreVar a
@@ -68,64 +75,32 @@ type CoreConstraint2 (c :: ((* -> *) -> * -> *) -> Constraint) k =
   , c (DataF k)
   )
 
-instance (CoreConstraint Eq k a) => Eq (CoreF k a) where
-  CoreVar x1 == CoreVar x2 = x1 == x2
-  CKind x1 == CKind x2 = x1 == x2
-  CType x1 == CType x2 = x1 == x2
-  CTerm x1 == CTerm x2 = x1 == x2
-  CPattern x1 == CPattern x2 = x1 == x2
-  CData x1 == CData x2 = x1 == x2
-  _ == _ = False
+instance (CoreConstraint1 Eq1 k, Eq a) => Eq (CoreF k a) where
+  (==) = eq1
 
-instance (CoreConstraint Ord k a) => Ord (CoreF k a) where
-  compare (CoreVar x1) (CoreVar x2) = compare x1 x2
-  compare (CoreVar _) _ = LT
-  compare _ (CoreVar _) = GT
-  compare (CKind x1) (CKind x2) = compare x1 x2
-  compare (CKind _) _ = LT
-  compare _ (CKind _) = GT
-  compare (CType x1) (CType x2) = compare x1 x2
-  compare (CType _) _ = LT
-  compare _ (CType _) = GT
-  compare (CTerm x1) (CTerm x2) = compare x1 x2
-  compare (CTerm _) _ = LT
-  compare _ (CTerm _) = GT
-  compare (CPattern x1) (CPattern x2) = compare x1 x2
-  compare (CPattern _) _ = LT
-  compare _ (CPattern _) = GT
-  compare (CData x1) (CData x2) = compare x1 x2
+instance CoreConstraint1 Eq1 k => Eq1 (CoreF k) where
+  liftEq = $(makeLiftEq ''CoreF)
 
-instance (CoreConstraint Show k a) => Show (CoreF k a) where
-  showsPrec n (CoreVar x) = showsPrec n x
-  showsPrec n (CKind x) = showsPrec n x
-  showsPrec n (CType x) = showsPrec n x
-  showsPrec n (CTerm x) = showsPrec n x
-  showsPrec n (CPattern x) = showsPrec n x
-  showsPrec n (CData x) = showsPrec n x
+instance (CoreConstraint1 Ord1 k, Ord a) => Ord (CoreF k a) where
+  compare = compare1
 
-instance CoreConstraint1 Functor k => Functor (CoreF k) where
-  fmap f (CoreVar x) = CoreVar $ f x
-  fmap f (CKind x) = CKind $ fmap f x
-  fmap f (CType x) = CType $ fmap f x
-  fmap f (CTerm x) = CTerm $ fmap f x
-  fmap f (CPattern x) = CPattern $ fmap f x
-  fmap f (CData x) = CData $ fmap f x
+instance (CoreConstraint1 Ord1 k) => Ord1 (CoreF k) where
+  liftCompare = $(makeLiftCompare ''CoreF)
 
-instance CoreConstraint1 Foldable k => Foldable (CoreF k) where
-  foldMap f (CoreVar x) = f x
-  foldMap f (CKind x) = foldMap f x
-  foldMap f (CType x) = foldMap f x
-  foldMap f (CTerm x) = foldMap f x
-  foldMap f (CPattern x) = foldMap f x
-  foldMap f (CData x) = foldMap f x
+instance (CoreConstraint1 Show1 k, Show a) => Show (CoreF k a) where
+  showsPrec = showsPrec1
 
-instance CoreConstraint1 Traversable k => Traversable (CoreF k) where
-  traverse f (CoreVar x) = CoreVar <$> f x
-  traverse f (CKind x) = CKind <$> traverse f x
-  traverse f (CType x) = CType <$> traverse f x
-  traverse f (CTerm x) = CTerm <$> traverse f x
-  traverse f (CPattern x) = CPattern <$> traverse f x
-  traverse f (CData x) = CData <$> traverse f x
+instance (CoreConstraint1 Show1 k) => Show1 (CoreF k) where
+  liftShowsPrec sp _ n (CoreVar x) = sp n x
+  liftShowsPrec sp sl n (CKind x) = liftShowsPrec sp sl n x
+  liftShowsPrec sp sl n (CType x) = liftShowsPrec sp sl n x
+  liftShowsPrec sp sl n (CTerm x) = liftShowsPrec sp sl n x
+  liftShowsPrec sp sl n (CPattern x) = liftShowsPrec sp sl n x
+  liftShowsPrec sp sl n (CData x) = liftShowsPrec sp sl n x
+
+deriving instance CoreConstraint1 Functor k => Functor (CoreF k)
+deriving instance CoreConstraint1 Foldable k => Foldable (CoreF k)
+deriving instance CoreConstraint1 Traversable k => Traversable (CoreF k)
 
 instance ( CoreConstraint1 Functor k
          , CoreConstraint2 Bound k

@@ -3,11 +3,17 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Term where
 
 import Control.Lens
 import Bound
+import Data.Functor.Classes
+import Data.Deriving
 
 import Lang
 
@@ -15,23 +21,27 @@ newtype Term k a = Term { unTerm :: CoreF k (CVar a)}
 
 makeWrapped ''Term
 
-instance (CoreConstraint Eq k (CVar a)) => Eq (Term k a) where
-  Term x1 == Term x2 = x1 == x2
+instance (CoreConstraint1 Eq1 k, Eq a) => Eq (Term k a) where
+  (==) = eq1
 
-instance (CoreConstraint Ord k (CVar a)) => Ord (Term k a) where
-  compare (Term x1) (Term x2) = compare x1 x2
+instance (CoreConstraint1 Eq1 k) => Eq1 (Term k) where
+  liftEq = $(makeLiftEq ''Term)
 
-instance (CoreConstraint Show k (CVar a)) => Show (Term k a) where
-  showsPrec n (Term x) = showsPrec n x
+instance (CoreConstraint1 Ord1 k, Ord a) => Ord (Term k a) where
+  compare = compare1
 
-instance CoreConstraint1 Functor k => Functor (Term k) where
-  fmap f (Term x) = Term $ fmap (fmap f) x
+instance (CoreConstraint1 Ord1 k) => Ord1 (Term k) where
+  liftCompare = $(makeLiftCompare ''Term)
 
-instance CoreConstraint1 Foldable k => Foldable (Term k) where
-  foldMap f (Term x) = foldMap (foldMap f) x
+instance (CoreConstraint1 Show1 k, Show a) => Show (Term k a) where
+  showsPrec = showsPrec1
 
-instance CoreConstraint1 Traversable k => Traversable (Term k) where
-  traverse f (Term x) = Term <$> traverse (traverse f) x
+instance (CoreConstraint1 Show1 k) => Show1 (Term k) where
+  liftShowsPrec = $(makeLiftShowsPrec ''Term)
+
+deriving instance CoreConstraint1 Functor k => Functor (Term k)
+deriving instance CoreConstraint1 Foldable k => Foldable (Term k)
+deriving instance CoreConstraint1 Traversable k => Traversable (Term k)
 
 _TermVar :: Prism' (Term k a) a
 _TermVar = _Wrapped . _CoreVar . _CTermVar
