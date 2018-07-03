@@ -4,7 +4,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-module TySTLC where
+module STLC.Structure.Type where
 
 import Data.Maybe (fromMaybe)
 import Data.Foldable (asum)
@@ -15,7 +15,7 @@ import Data.Functor.Classes
 import Data.Deriving
 
 import Lang
-import Type
+import Structure.Type
 
 data TySTLCF ty a =
   TyFArr (ty a) (ty a)

@@ -5,7 +5,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-module TyBool where
+module Bool.Structure.Type where
 
 import Control.Lens
 import Bound
@@ -13,7 +13,7 @@ import Data.Functor.Classes
 import Data.Deriving
 
 import Lang
-import Type
+import Structure.Type
 
 data TyBoolF (ty :: * -> *) a =
     TyFBool

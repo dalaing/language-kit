@@ -21,13 +21,20 @@ import Data.Deriving
 
 import Lang
 
-import TmInt
-import TmBool
-import TmEq
-import TmSTLC
-import TyInt
-import TyBool
-import TySTLC
+import Int.Structure.Term
+import Bool.Structure.Term
+import Eq.Structure.Term
+import STLC.Structure.Term
+
+import Int.Structure.Type
+import Bool.Structure.Type
+import STLC.Structure.Type
+
+import Rule.Eval
+import Int.Rule.Eval
+import Bool.Rule.Eval
+import Eq.Rule.Eval
+import STLC.Rule.Eval
 
 data IBE
 
@@ -191,3 +198,24 @@ instance Show1 (DataF IBE f) where
 
 instance Bound (DataF IBE) where
   _ >>>= _ = Dt
+
+evalRulesIn :: Eq a => EvalRulesIn IBE a
+evalRulesIn =
+  mconcat [
+    intRulesEval
+  , boolRulesEval
+  , eqRulesEval
+  , stlcRulesEval
+  ]
+
+evalRulesOut :: Eq a => EvalRulesOut IBE a
+evalRulesOut = mkEval evalRulesIn
+
+value :: Eq a => ValueFn IBE a
+value = valueFn evalRulesOut
+
+step :: Eq a => StepFn IBE a
+step = stepFn evalRulesOut
+
+eval :: Eq a => EvalFn IBE a
+eval = evalFn evalRulesOut

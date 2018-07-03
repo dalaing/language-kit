@@ -4,7 +4,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-module TmInt where
+module Int.Structure.Term where
 
 import Data.Maybe (fromMaybe)
 import Data.Foldable (asum)
@@ -15,7 +15,7 @@ import Data.Functor.Classes
 import Data.Deriving
 
 import Lang
-import Term
+import Structure.Term
 
 data TmIntF tm a =
     TmFIntLit Int

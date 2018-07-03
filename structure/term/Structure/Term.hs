@@ -8,7 +8,7 @@
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Term where
+module Structure.Term where
 
 import Control.Lens
 import Bound

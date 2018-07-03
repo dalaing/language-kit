@@ -5,7 +5,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleContexts #-}
-module TmSTLC where
+module STLC.Structure.Term where
 
 import Data.Maybe (fromMaybe)
 import Data.Foldable (asum)
@@ -16,8 +16,8 @@ import Data.Functor.Classes
 import Data.Deriving
 
 import Lang
-import Term
-import Type
+import Structure.Term
+import Structure.Type
 
 data TmSTLCF tm a =
     TmFApp (tm a) (tm a)

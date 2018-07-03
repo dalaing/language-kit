@@ -5,7 +5,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-module TyInt where
+module Int.Structure.Type where
 
 import Control.Lens
 import Bound
@@ -13,7 +13,7 @@ import Data.Functor.Classes
 import Data.Deriving
 
 import Lang
-import Type
+import Structure.Type
 
 data TyIntF (ty :: * -> *) a =
     TyFInt

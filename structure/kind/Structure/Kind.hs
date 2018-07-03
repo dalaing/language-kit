@@ -8,7 +8,7 @@
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Kind where
+module Structure.Kind where
 
 import Control.Lens
 import Data.Functor.Classes
