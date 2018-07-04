@@ -31,8 +31,10 @@ library structure-term
 
 library structure-pattern
   exposed-modules:     Structure.Pattern
+                     , Structure.Alt
   build-depends:       base >=4.9 && < 5
                      , lens >=4.16 && < 4.17
+                     , bound >= 2.0.1 && < 2.1
                      , deriving-compat >= 0.4 && < 0.5
                      , lang
   hs-source-dirs:      structure/pattern
